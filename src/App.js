@@ -10,7 +10,6 @@ const App = () => {
   const fetchData = async (url) => {
     try {
       console.log(url);
-      
       const response = await axios.get(url);
       console.log(response.data);
       

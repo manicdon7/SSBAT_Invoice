@@ -25,7 +25,7 @@ const App = () => {
     }
   };
 
-  // Load data when the component mounts
+
   useEffect(() => {
     const API_URL = 'https://script.google.com/macros/s/AKfycbxqwdU2F0A5K-wGVMAu_Z6uO7bqjmQu4lsq_vPeE3KfLhxI7f5N9AdLIMoXMd36Krk/exec';
 

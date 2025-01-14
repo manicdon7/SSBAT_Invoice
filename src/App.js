@@ -6,7 +6,6 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch data from the API
   const fetchData = async (url) => {
     try {
       console.log(url);

@@ -2,7 +2,7 @@ import React from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 // import { Card } from '@/components/ui/card';
-import dr from "../src/Assests/dr.png";
+import dr from "../src/assets/dr.png";
 import { IoIosMail } from "react-icons/io";
 import { MdCall } from "react-icons/md";
 

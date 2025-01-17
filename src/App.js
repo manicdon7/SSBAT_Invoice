@@ -104,7 +104,7 @@
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
 
-//   const API_URL = 'https://script.google.com/macros/s/AKfycbxnSQV3Cur6nV9Y1KtWevyyn6vgAuIZ10TyZUDqs7efhBjFRWPrgtCmfSVn2vBqzKA/exec';
+//   const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=PWQO5XQHUI4d0_ovv7S6gnt2_zT_rUF59q8qQ1Y7Zo_70_HOl5igHPBVy_O6szuimyK7ovO_4BVBApGS693LQyNZrfxn05yRm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnH5A-FEnX_LrCL_fCzMM7HhFtQ2GICf_m1ZSd4wjwze5DSXYXQxRXXsCuGaFaozWYEup_NK2jc7eAPic45JyYjpbXZJsqogUIg&lib=MXiP-_xR-HvtIm9mw9nBB5w_yjbgoiDNP';
 
 //   const fetchData = async () => {
 //     try {
@@ -152,107 +152,90 @@
 // export default App;
 
 
-// App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DonationReceipt from './DonationReceiptPDFGenerator';
 
 const App = () => {
-  // Sample data array to simulate CSV content
-  const donations = [
-    {
-      Receipt_NO: "241101789",
-      Donation_Date: "06-11-2024",
-      Contributor_Name: "abc",
-      Mobile_No: "xxxxxxxxxx",
-      Amount: "2500",
-      Amount_in_words: "Two Thousand Five Hundred Rupees Only",
-      Address: "",
-      Payment_mode: "ICICI",
-      Contribution_Date: "06-11-2024",
-      PAN_No: "xxxxxxxxxxxxx"
-    },
-    // Add more donation records as needed
-  ];
-
+  const [donations, setDonations] = useState([]);
   const [selectedDonation, setSelectedDonation] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Function to handle file upload
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target.result;
-        const rows = text.split('\n');
-        const headers = rows[0].split(',');
+  // Fetch data from the provided URL
+  useEffect(() => {
+    const fetchDonations = async () => {
+      try {
+        // Fetching the data from the Google Apps Script Web App
+        const response = await fetch(
+          'https://script.google.com/macros/s/AKfycbxeiVZ4g-d1QUBplHzUMTj5LXr5bKxwLCvaYNlaCAS5KUXOo2bCzjKWmN79QKyLPl_Z/exec'
+        );
         
-        const parsedDonations = rows.slice(1).map(row => {
-          const values = row.split(',');
-          const donation = {};
-          headers.forEach((header, index) => {
-            donation[header.trim()] = values[index]?.trim() || '';
-          });
-          return donation;
-        });
+        // Check if response is ok (status code 200-299)
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-        // Update donations state here if you want to make it dynamic
-        console.log('Parsed donations:', parsedDonations);
-      };
-      reader.readAsText(file);
-    }
-  };
+        // Parsing JSON response
+        const data = await response.json();
+        console.log('Fetched data:', data); // Log the entire data for debugging
+
+        // Assuming the response has a "data" field containing the donations
+        if (data.status === 'success' && Array.isArray(data.data)) {
+          setDonations(data.data);
+        } else {
+          console.error('Invalid data structure received:', data);
+        }
+      } catch (error) {
+        console.error('Error fetching donations:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDonations();
+  }, []);
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Donation Receipt Generator</h1>
-      
-      {/* File upload section */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Upload Donations CSV</h2>
-        <input 
-          type="file" 
-          accept=".csv"
-          onChange={handleFileUpload}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:text-sm file:font-semibold
-            file:bg-blue-50 file:text-blue-700
-            hover:file:bg-blue-100"
-        />
-      </div>
+    <div>
+      <h1>Donation Receipt Generator</h1>
 
-      {/* Donations list */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Select Donation to Generate Receipt</h2>
-        <div className="grid gap-4">
-          {donations.map((donation, index) => (
-            <div 
-              key={donation.Receipt_NO || index}
-              className="border p-4 rounded cursor-pointer hover:bg-gray-50"
-              onClick={() => setSelectedDonation(donation)}
-            >
-              <p className="font-medium">Receipt No: {donation.Receipt_NO}</p>
-              <p>Contributor: {donation.Contributor_Name}</p>
-              <p>Amount: Rs. {donation.Amount}</p>
-              <p>Date: {donation.Donation_Date}</p>
+      {loading ? (
+        <p>Loading donations...</p>
+      ) : (
+        <>
+          {/* Donations list */}
+          <div>
+            <h2>Select Donation to Generate Receipt</h2>
+            {donations.length > 0 ? (
+              <ul>
+                {donations.map((donation, index) => (
+                  <li
+                    key={index}
+                    onClick={() => setSelectedDonation(donation)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <p>Receipt No: {donation.Receipt_NO}</p>
+                    <p>Contributor: {donation.Contributor_Name}</p>
+                    <p>Amount: Rs. {donation.Amount}</p>
+                    <p>Date: {donation.Donation_Date}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No donations found.</p>
+            )}
+          </div>
+
+          {/* Receipt preview */}
+          {selectedDonation && (
+            <div>
+              <h3>Receipt Preview</h3>
+              <DonationReceipt donation={selectedDonation} />
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Receipt preview */}
-      {selectedDonation && (
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Receipt Preview</h2>
-          <DonationReceipt donationData={selectedDonation} />
-        </div>
+          )}
+        </>
       )}
     </div>
   );
 };
 
 export default App;
-
-
-

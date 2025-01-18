@@ -151,41 +151,77 @@
 
 // export default App;
 
-
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaFileDownload, FaEye, FaTimes, FaSpinner, FaRupeeSign, FaCalendarAlt, FaUser } from 'react-icons/fa';
 import DonationReceipt from './DonationReceiptPDFGenerator';
+
+const Modal = ({ isOpen, onClose, children }) => (
+  <AnimatePresence>
+    {isOpen && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm"
+      >
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          className="bg-white rounded-xl p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-auto relative shadow-2xl"
+        >
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 p-2 rounded-full hover:bg-red-50 transition-colors text-red-600"
+          >
+            <FaTimes className="w-5 h-5" />
+          </button>
+          {children}
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
 
 const App = () => {
   const [donations, setDonations] = useState([]);
   const [selectedDonation, setSelectedDonation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  // Fetch data from the provided URL
   useEffect(() => {
     const fetchDonations = async () => {
       try {
-        // Fetching the data from the Google Apps Script Web App
+        setLoading(true);
+        setError(null);
         const response = await fetch(
           'https://script.google.com/macros/s/AKfycbxeiVZ4g-d1QUBplHzUMTj5LXr5bKxwLCvaYNlaCAS5KUXOo2bCzjKWmN79QKyLPl_Z/exec'
         );
         
-        // Check if response is ok (status code 200-299)
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
-        // Parsing JSON response
-        const data = await response.json();
-        console.log('Fetched data:', data); // Log the entire data for debugging
-
-        // Assuming the response has a "data" field containing the donations
-        if (data.status === 'success' && Array.isArray(data.data)) {
-          setDonations(data.data);
+        
+        const result = await response.json();
+        
+        if (result.status === 'success' && Array.isArray(result.data)) {
+          // Transform the data to match the expected format
+          const transformedData = result.data.map(donation => ({
+            ...donation,
+            Receipt_NO: donation.Receipt_NO?.toString() || '',
+            Contributor_Name: donation["Contributor's_Name"] || '',
+            Amount: parseFloat(donation.Amount) || 0,
+            Donation_Date: donation.Donation_Date || ''
+          }));
+          setDonations(transformedData);
         } else {
-          console.error('Invalid data structure received:', data);
+          throw new Error('Invalid data format received');
         }
       } catch (error) {
         console.error('Error fetching donations:', error);
+        setError('Failed to load donations. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -194,46 +230,136 @@ const App = () => {
     fetchDonations();
   }, []);
 
+  const formatDate = (dateString) => {
+    try {
+      return new Date(dateString).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  const handlePreviewClick = (e, donation) => {
+    e.stopPropagation(); // Prevent card selection when clicking preview
+    setSelectedDonation(donation);
+    setIsPreviewOpen(true);
+  };
+
+  const handleDownloadClick = (e) => {
+    e.stopPropagation(); // Prevent card selection when clicking download
+    // Implement download logic here
+  };
+
   return (
-    <div>
-      <h1>Donation Receipt Generator</h1>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-red-600 mb-2">
+            Donation Receipt Generator
+          </h1>
+          <p className="text-yellow-600">Manage and generate donation receipts efficiently</p>
+        </div>
 
-      {loading ? (
-        <p>Loading donations...</p>
-      ) : (
-        <>
-          {/* Donations list */}
-          <div>
-            <h2>Select Donation to Generate Receipt</h2>
-            {donations.length > 0 ? (
-              <ul>
-                {donations.map((donation, index) => (
-                  <li
-                    key={index}
-                    onClick={() => setSelectedDonation(donation)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <p>Receipt No: {donation.Receipt_NO}</p>
-                    <p>Contributor: {donation.Contributor_Name}</p>
-                    <p>Amount: Rs. {donation.Amount}</p>
-                    <p>Date: {donation.Donation_Date}</p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-red-100">
+          {loading ? (
+            <div className="flex items-center justify-center p-12">
+              <FaSpinner className="w-8 h-8 animate-spin text-red-500" />
+            </div>
+          ) : error ? (
+            <div className="text-center p-12 text-red-600">
+              <p>{error}</p>
+            </div>
+          ) : donations.length === 0 ? (
+            <div className="text-center p-12 text-gray-600">
               <p>No donations found.</p>
-            )}
-          </div>
-
-          {/* Receipt preview */}
-          {selectedDonation && (
-            <div>
-              <h3>Receipt Preview</h3>
-              <DonationReceipt donation={selectedDonation} />
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {donations.map((donation, index) => (
+                <motion.div
+                  key={donation.Receipt_NO || index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div
+                    className={`bg-white rounded-xl border transition-all duration-300 cursor-pointer 
+                    hover:shadow-lg hover:border-red-200 group ${
+                      selectedDonation?.Receipt_NO === donation.Receipt_NO
+                        ? 'ring-2 ring-red-400 shadow-lg'
+                        : 'border-gray-200'
+                    }`}
+                    onClick={() => setSelectedDonation(donation)}
+                  >
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="font-bold text-lg text-red-600">
+                          Receipt #{donation.Receipt_NO}
+                        </h3>
+                        <span className="text-yellow-600 text-sm font-semibold">
+                          {donation.Payment_mode}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-gray-700">
+                          <FaUser className="text-red-400" />
+                          <span className="font-medium">{donation.Contributor_Name}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-gray-700">
+                          <FaRupeeSign className="text-yellow-500" />
+                          <span className="font-medium">
+                            ₹{donation.Amount.toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <FaCalendarAlt className="text-red-400" />
+                          <span>{formatDate(donation.Donation_Date)}</span>
+                        </div>
+                      </div>
+                      
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-6 flex gap-3"
+                      >
+                        <button
+                          onClick={(e) => handlePreviewClick(e, donation)}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex-1"
+                        >
+                          <FaEye className="w-4 h-4" />
+                          Preview
+                        </button>
+                        {/* <button
+                          onClick={handleDownloadClick}
+                          className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors flex-1"
+                        >
+                          <FaFileDownload className="w-4 h-4" />
+                          Download
+                        </button> */}
+                      </motion.div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           )}
-        </>
-      )}
+        </div>
+      </div>
+
+      <Modal isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
+        <div className="h-full">
+          <h2 className="text-2xl font-bold mb-4 text-red-600">Receipt Preview</h2>
+          {selectedDonation && (
+            <DonationReceipt donationData={selectedDonation} />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -104,7 +104,7 @@
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState(null);
 
-//   const API_URL = 'https://script.google.com/macros/s/AKfycbxnSQV3Cur6nV9Y1KtWevyyn6vgAuIZ10TyZUDqs7efhBjFRWPrgtCmfSVn2vBqzKA/exec';
+//   const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=PWQO5XQHUI4d0_ovv7S6gnt2_zT_rUF59q8qQ1Y7Zo_70_HOl5igHPBVy_O6szuimyK7ovO_4BVBApGS693LQyNZrfxn05yRm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnH5A-FEnX_LrCL_fCzMM7HhFtQ2GICf_m1ZSd4wjwze5DSXYXQxRXXsCuGaFaozWYEup_NK2jc7eAPic45JyYjpbXZJsqogUIg&lib=MXiP-_xR-HvtIm9mw9nBB5w_yjbgoiDNP';
 
 //   const fetchData = async () => {
 //     try {
@@ -151,108 +151,217 @@
 
 // export default App;
 
-
-// App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaFileDownload, FaEye, FaTimes, FaSpinner, FaRupeeSign, FaCalendarAlt, FaUser } from 'react-icons/fa';
 import DonationReceipt from './DonationReceiptPDFGenerator';
 
+const Modal = ({ isOpen, onClose, children }) => (
+  <AnimatePresence>
+    {isOpen && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm"
+      >
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          className="bg-white rounded-xl p-6 w-11/12 max-w-4xl max-h-[90vh] overflow-auto relative shadow-2xl"
+        >
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 p-2 rounded-full hover:bg-red-50 transition-colors text-red-600"
+          >
+            <FaTimes className="w-5 h-5" />
+          </button>
+          {children}
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+
 const App = () => {
-  // Sample data array to simulate CSV content
-  const donations = [
-    {
-      Receipt_NO: "241101789",
-      Donation_Date: "06-11-2024",
-      Contributor_Name: "abc",
-      Mobile_No: "xxxxxxxxxx",
-      Amount: "2500",
-      Amount_in_words: "Two Thousand Five Hundred Rupees Only",
-      Address: "",
-      Payment_mode: "ICICI",
-      Contribution_Date: "06-11-2024",
-      PAN_No: "xxxxxxxxxxxxx"
-    },
-    // Add more donation records as needed
-  ];
-
+  const [donations, setDonations] = useState([]);
   const [selectedDonation, setSelectedDonation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  // Function to handle file upload
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target.result;
-        const rows = text.split('\n');
-        const headers = rows[0].split(',');
+  useEffect(() => {
+    const fetchDonations = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetch(
+          'https://script.google.com/macros/s/AKfycbxeiVZ4g-d1QUBplHzUMTj5LXr5bKxwLCvaYNlaCAS5KUXOo2bCzjKWmN79QKyLPl_Z/exec'
+        );
         
-        const parsedDonations = rows.slice(1).map(row => {
-          const values = row.split(',');
-          const donation = {};
-          headers.forEach((header, index) => {
-            donation[header.trim()] = values[index]?.trim() || '';
-          });
-          return donation;
-        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.status === 'success' && Array.isArray(result.data)) {
+          // Transform the data to match the expected format
+          const transformedData = result.data.map(donation => ({
+            ...donation,
+            Receipt_NO: donation.Receipt_NO?.toString() || '',
+            Contributor_Name: donation["Contributor's_Name"] || '',
+            Amount: parseFloat(donation.Amount) || 0,
+            Donation_Date: donation.Donation_Date || ''
+          }));
+          setDonations(transformedData);
+        } else {
+          throw new Error('Invalid data format received');
+        }
+      } catch (error) {
+        console.error('Error fetching donations:', error);
+        setError('Failed to load donations. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        // Update donations state here if you want to make it dynamic
-        console.log('Parsed donations:', parsedDonations);
-      };
-      reader.readAsText(file);
+    fetchDonations();
+  }, []);
+
+  const formatDate = (dateString) => {
+    try {
+      return new Date(dateString).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateString;
     }
   };
 
+  const handlePreviewClick = (e, donation) => {
+    e.stopPropagation(); // Prevent card selection when clicking preview
+    setSelectedDonation(donation);
+    setIsPreviewOpen(true);
+  };
+
+  const handleDownloadClick = (e) => {
+    e.stopPropagation(); // Prevent card selection when clicking download
+    // Implement download logic here
+  };
+
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Donation Receipt Generator</h1>
-      
-      {/* File upload section */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Upload Donations CSV</h2>
-        <input 
-          type="file" 
-          accept=".csv"
-          onChange={handleFileUpload}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:text-sm file:font-semibold
-            file:bg-blue-50 file:text-blue-700
-            hover:file:bg-blue-100"
-        />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-red-600 mb-2">
+            Donation Receipt Generator
+          </h1>
+          <p className="text-yellow-600">Manage and generate donation receipts efficiently</p>
+        </div>
 
-      {/* Donations list */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Select Donation to Generate Receipt</h2>
-        <div className="grid gap-4">
-          {donations.map((donation, index) => (
-            <div 
-              key={donation.Receipt_NO || index}
-              className="border p-4 rounded cursor-pointer hover:bg-gray-50"
-              onClick={() => setSelectedDonation(donation)}
-            >
-              <p className="font-medium">Receipt No: {donation.Receipt_NO}</p>
-              <p>Contributor: {donation.Contributor_Name}</p>
-              <p>Amount: Rs. {donation.Amount}</p>
-              <p>Date: {donation.Donation_Date}</p>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-red-100">
+          {loading ? (
+            <div className="flex items-center justify-center p-12">
+              <FaSpinner className="w-8 h-8 animate-spin text-red-500" />
             </div>
-          ))}
+          ) : error ? (
+            <div className="text-center p-12 text-red-600">
+              <p>{error}</p>
+            </div>
+          ) : donations.length === 0 ? (
+            <div className="text-center p-12 text-gray-600">
+              <p>No donations found.</p>
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {donations.map((donation, index) => (
+                <motion.div
+                  key={donation.Receipt_NO || index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div
+                    className={`bg-white rounded-xl border transition-all duration-300 cursor-pointer 
+                    hover:shadow-lg hover:border-red-200 group ${
+                      selectedDonation?.Receipt_NO === donation.Receipt_NO
+                        ? 'ring-2 ring-red-400 shadow-lg'
+                        : 'border-gray-200'
+                    }`}
+                    onClick={() => setSelectedDonation(donation)}
+                  >
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="font-bold text-lg text-red-600">
+                          Receipt #{donation.Receipt_NO}
+                        </h3>
+                        <span className="text-yellow-600 text-sm font-semibold">
+                          {donation.Payment_mode}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-gray-700">
+                          <FaUser className="text-red-400" />
+                          <span className="font-medium">{donation.Contributor_Name}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-gray-700">
+                          <FaRupeeSign className="text-yellow-500" />
+                          <span className="font-medium">
+                            ₹{donation.Amount.toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <FaCalendarAlt className="text-red-400" />
+                          <span>{formatDate(donation.Donation_Date)}</span>
+                        </div>
+                      </div>
+                      
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-6 flex gap-3"
+                      >
+                        <button
+                          onClick={(e) => handlePreviewClick(e, donation)}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex-1"
+                        >
+                          <FaEye className="w-4 h-4" />
+                          Preview
+                        </button>
+                        {/* <button
+                          onClick={handleDownloadClick}
+                          className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors flex-1"
+                        >
+                          <FaFileDownload className="w-4 h-4" />
+                          Download
+                        </button> */}
+                      </motion.div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Receipt preview */}
-      {selectedDonation && (
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Receipt Preview</h2>
-          <DonationReceipt donationData={selectedDonation} />
+      <Modal isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
+        <div className="h-full">
+          <h2 className="text-2xl font-bold mb-4 text-red-600">Receipt Preview</h2>
+          {selectedDonation && (
+            <DonationReceipt donationData={selectedDonation} />
+          )}
         </div>
-      )}
+      </Modal>
     </div>
   );
 };
 
 export default App;
-
-
-

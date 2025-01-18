@@ -28,7 +28,7 @@ const DonationReceipt = ({ donationData }) => {
             </button>
 
             {/* Main container */}
-            <div className="relative w-[210mm] h-[297mm] mx-auto" id="donation-receipt">
+            <div className="relative w-[210mm] h-[297mm] mx-auto font-sans" id="donation-receipt">
                 {/* Background template */}
                 <img
                     src={tp}

@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import dr from "../src/assets/dr.png";
 import { IoIosMail } from "react-icons/io";
 import { MdCall } from "react-icons/md";
-import tp from "../src/assets/totalpage.png";
+import tp from "../src/assets/totalpagepdf.png";
 
 const DonationReceipt = ({ donationData }) => {
     const generatePDF = async () => {
@@ -28,7 +28,7 @@ const DonationReceipt = ({ donationData }) => {
             </button>
 
             {/* Main container */}
-            <div className="relative w-[210mm] h-[297mm] mx-auto" id="donation-receipt">
+            <div className="relative w-[210mm] h-[297mm] mx-auto font-sans" id="donation-receipt">
                 {/* Background template */}
                 <img
                     src={tp}
@@ -61,7 +61,7 @@ const DonationReceipt = ({ donationData }) => {
                             alt="DONATION RECEIPT background"
                             className="h-full w-96"
                         />
-                        <h2 className="absolute text-3xl font-bold text-red-700 bottom-10">
+                        <h2 className="absolute text-3xl font-bold font-alice text-red-700 bottom-10">
                             DONATION RECEIPT
                         </h2>
                     </div>
@@ -70,54 +70,55 @@ const DonationReceipt = ({ donationData }) => {
                     <div className="px-8">
                         <div className="grid grid-cols-2 gap-8 mb-8">
                             <div className="bg-[#fce805] px-4 py-2 rounded-full">
-                                <p className="font-extrabold px-4 mb-4">Receipt No: {donationData.Receipt_NO}</p>
+                                <p className="font-extrabold text-xl px-4 mb-4">Receipt No: {donationData.Receipt_NO}</p>
                             </div>
                             <div className="bg-[#fce805] px-4 py-2 rounded-full">
-                                <p className="font-extrabold px-4 mb-4">Donation Date: {donationData.Donation_Date}</p>
+                                <p className="font-extrabold text-xl px-4 mb-4">Donation Date: {donationData.Donation_Date}</p>
                             </div>
                         </div>
 
                         {/* Contributor Details */}
-                        <div className="space-y-4 mb-8 text-[#750004] font-extrabold ml-20">
+                        <div className="space-y-3 mb-6 text-[#750004] ml-20 font-alice">
                             <div className="grid grid-cols-3 gap-2">
-                                <p>Contributor's Name</p>
-                                <p className="col-span-2">: &nbsp;{donationData.Contributor_Name}</p>
+                                <p className='font-extrabold'>Contributor's Name</p>
+                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Contributor_Name}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                                <p>Mobile No</p>
-                                <p className="col-span-2">: &nbsp;{donationData.Mobile_No}</p>
+                                <p className='font-extrabold'>Mobile No</p>
+                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Mobile_No}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                                <p>Amount</p>
-                                <p className="col-span-2">: &nbsp;{donationData.Amount}</p>
+                                <p className='font-extrabold'>Amount</p>
+                                {/* <p className="col-span-2">: &nbsp;{donationData.Amount}</p> */}
+                                <p className="col-span-2 font-extrabold">: &nbsp;₹ {parseFloat(donationData.Amount).toFixed(2)}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                                <p>Amount in words</p>
-                                <p className="col-span-2">: &nbsp;{donationData.Amount_in_words}</p>
+                                <p className='font-extrabold'>Amount in words</p>
+                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Amount_in_words}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                                <p>Address</p>
-                                <p className="col-span-2">: &nbsp;{donationData.Address}</p>
+                                <p className='font-extrabold'>Address</p>
+                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Address}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                                <p>Payment Mode</p>
-                                <p className="col-span-2">: &nbsp;{donationData.Payment_mode}</p>
+                                <p className='font-extrabold'>Payment Mode</p>
+                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Payment_mode}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                                <p>Contribution Date</p>
-                                <p className="col-span-2">: &nbsp;{donationData.Contribution_Date}</p>
+                                <p className='font-extrabold'>Contribution Date</p>
+                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Contribution_Date}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                                <p>PAN No</p>
-                                <p className="col-span-2">: &nbsp;{donationData.PAN_No}</p>
+                                <p className='font-extrabold'>PAN No</p>
+                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.PAN_No}</p>
                             </div>
                         </div>
 
                         {/* Footer Message */}
-                        <div className="text-center mb-8">
-                            <p className="italic mb-4">
-                                Our Heartfelt Gratitude for Your Support, to Help US Create an Opportunity
-                                to Serve Our Sadhguru, Shirdhi Sai Baba, By Spreading Love to All Needy
+                        <div className="text-center mb-4">
+                            <p className="font-oregano mb-2 text-2xl">
+                                Our Heartfelt Gratitude for Your Support, to Help US Create an Opportunity<br></br>
+                                to Serve Our Sadhguru, Shirdhi Sai Baba, By Spreading Love to All Needy<br></br>
                                 Through Various Activities
                             </p>
                             <p className="text-sm">
@@ -127,9 +128,9 @@ const DonationReceipt = ({ donationData }) => {
                         </div>
 
                         {/* Trust Footer */}
-                        <div className="mt-8">
+                        <div className="mt-8 mr-20">
                             <p className="text-right mb-4 font-extrabold">For Shirdi Sai Baba Annadhanam Trust</p>
-                            <p className="text-right font-extrabold mt-20">Authorized Signatory</p>
+                            <p className="text-right font-extrabold mt-16">Authorized Signatory</p>
                         </div>
                     </div>
 

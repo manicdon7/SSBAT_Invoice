@@ -1,10 +1,10 @@
 import React from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import dr from "../src/Assests/dr.png";
+import dr from "../src/assets/dr.png";
 import { IoIosMail } from "react-icons/io";
 import { MdCall } from "react-icons/md";
-import tp from "../src/Assests/totalpage.png";
+import tp from "../src/assets/totalpage.png";
 
 const DonationReceipt = ({ donationData }) => {
     const generatePDF = async () => {

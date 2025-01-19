@@ -35,47 +35,7 @@ const DonationReceipt = ({ donationData }) => {
         pdf.save(`donation-receipt-${donationData.Receipt_NO}.pdf`);
     };
 
-    const handleShare = async () => {
-        const pdfBlob = await generatePDF();
-        const pdfFile = new File([pdfBlob], `donation-receipt-${donationData.Receipt_NO}.pdf`, { type: "application/pdf" });
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: "Donation Receipt",
-                    text: `Here's the donation receipt from Shirdi Sai Baba Annadanam Trust.`,
-                    files: [pdfFile], // Attach the PDF file for sharing
-                });
-                alert("Shared successfully!");
-            } catch (error) {
-                console.error("Error sharing:", error);
-            }
-        } else {
-            alert("Web Share API is not supported on this device. Use social media buttons instead.");
-        }
-    };
-
-    const shareToSocialMedia = (platform) => {
-        const encodedURL = encodeURIComponent(window.location.href);
-        const encodedText = encodeURIComponent("Here's the donation receipt from Shirdi Sai Baba Annadanam Trust!");
-
-        switch (platform) {
-            case "whatsapp":
-                window.open(`https://wa.me/?text=${encodedText}%20${encodedURL}`, "_blank");
-                break;
-            case "facebook":
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedURL}`, "_blank");
-                break;
-            case "twitter":
-                window.open(`https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedURL}`, "_blank");
-                break;
-            case "instagram":
-                alert("Instagram sharing is not supported via web. Use the app to share this content.");
-                break;
-            default:
-                break;
-        }
-    };
+   
 
     return (
         <div className="p-4">

@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import dr from "../src/assets/dr.png";
 import { IoIosMail } from "react-icons/io";
 import { MdCall } from "react-icons/md";
-import tp from "../src/assets/totalpagepdf.png";
+import tp from "../src/assets/SSBATTotalPage.png";
 
 const DonationReceipt = ({ donationData }) => {
     const generatePDF = async () => {
@@ -128,9 +128,9 @@ const DonationReceipt = ({ donationData }) => {
                         </div>
 
                         {/* Trust Footer */}
-                        <div className="mt-8 mr-20">
-                            <p className="text-right mb-4 font-extrabold">For Shirdi Sai Baba Annadhanam Trust</p>
-                            <p className="text-right font-extrabold mt-16">Authorized Signatory</p>
+                        <div className="mt-8">
+                            <p className="text-right mb-4 font-extrabold mr-9">For Shirdi Sai Baba Annadhanam Trust</p>
+                            <p className="text-right font-extrabold mt-16 mr-24">Authorized Signatory</p>
                         </div>
                     </div>
 

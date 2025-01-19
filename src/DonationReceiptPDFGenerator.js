@@ -7,15 +7,74 @@ import { MdCall } from "react-icons/md";
 import tp from "../src/assets/SSBATTotalPage.png";
 
 const DonationReceipt = ({ donationData }) => {
+    // const generatePDF = async () => {
+    //     const receipt = document.getElementById('donation-receipt');
+    //     const canvas = await html2canvas(receipt);
+    //     const imgData = canvas.toDataURL('image/png');
+    //     const pdf = new jsPDF('p', 'mm', 'a4');
+    //     const pdfWidth = pdf.internal.pageSize.getWidth();
+    //     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    //     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    //     pdf.save(`donation-receipt-${donationData.Receipt_NO}.pdf`);
+    // };
+
     const generatePDF = async () => {
         const receipt = document.getElementById('donation-receipt');
-        const canvas = await html2canvas(receipt);
+        const canvas = await html2canvas(receipt, { scale: 2 }); // Higher scale for better quality
         const imgData = canvas.toDataURL('image/png');
+        
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'FAST'); // Optimize compression
+        const pdfBlob = pdf.output('blob');
+        
+        // Convert to KB and download
+        const fileSizeInKB = pdfBlob.size / 1024;
+        console.log(`PDF Size: ${fileSizeInKB.toFixed(2)} KB`);
         pdf.save(`donation-receipt-${donationData.Receipt_NO}.pdf`);
+    };
+
+    const handleShare = async () => {
+        const pdfBlob = await generatePDF();
+        const pdfFile = new File([pdfBlob], `donation-receipt-${donationData.Receipt_NO}.pdf`, { type: "application/pdf" });
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: "Donation Receipt",
+                    text: `Here's the donation receipt from Shirdi Sai Baba Annadanam Trust.`,
+                    files: [pdfFile], // Attach the PDF file for sharing
+                });
+                alert("Shared successfully!");
+            } catch (error) {
+                console.error("Error sharing:", error);
+            }
+        } else {
+            alert("Web Share API is not supported on this device. Use social media buttons instead.");
+        }
+    };
+
+    const shareToSocialMedia = (platform) => {
+        const encodedURL = encodeURIComponent(window.location.href);
+        const encodedText = encodeURIComponent("Here's the donation receipt from Shirdi Sai Baba Annadanam Trust!");
+
+        switch (platform) {
+            case "whatsapp":
+                window.open(`https://wa.me/?text=${encodedText}%20${encodedURL}`, "_blank");
+                break;
+            case "facebook":
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedURL}`, "_blank");
+                break;
+            case "twitter":
+                window.open(`https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedURL}`, "_blank");
+                break;
+            case "instagram":
+                alert("Instagram sharing is not supported via web. Use the app to share this content.");
+                break;
+            default:
+                break;
+        }
     };
 
     return (
@@ -26,6 +85,7 @@ const DonationReceipt = ({ donationData }) => {
             >
                 Download Receipt
             </button>
+            
 
             {/* Main container */}
             <div className="relative w-[210mm] h-[297mm] mx-auto font-sans" id="donation-receipt">

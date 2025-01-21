@@ -6,4 +6,12 @@
 .text-shadow {
     text-shadow: 2px 2px 4px rgb(217, 160, 162 , 10); /* Adjust the values for shadow effect */
   }
+
+  @media (max-width: 768px) {
+    #donation-receipt {
+        width: 210mm !important;
+        height: 297mm !important;
+    }
+}
+
   

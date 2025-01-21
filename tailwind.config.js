@@ -6,6 +6,7 @@ module.exports = {
       fontFamily: {
         oregano: ['Oregano', 'cursive'],
         alice: ['Alice', 'serif'], // Add the font with a fallback
+        canvasans: ['"Open Sans"', 'sans-serif'],
       },
     },
   },

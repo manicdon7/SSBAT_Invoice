@@ -20,18 +20,13 @@ const DonationReceipt = ({ donationData }) => {
 
     const generatePDF = async () => {
         const receipt = document.getElementById('donation-receipt');
-        // const canvas = await html2canvas(receipt, { scale: 2 }); // Higher scale for better quality
-        const canvas = await html2canvas(receipt, { 
-            scale: window.devicePixelRatio > 1 ? window.devicePixelRatio : 2, 
-            useCORS: true 
-        });        
+        const canvas = await html2canvas(receipt, { scale: 2 }); // Higher scale for better quality
         const imgData = canvas.toDataURL('image/png');
         
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        // pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'FAST'); // Optimize compression
-        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, '', 'FAST');
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'FAST'); // Optimize compression
         const pdfBlob = pdf.output('blob');
         
         // Convert to KB and download
@@ -53,7 +48,7 @@ const DonationReceipt = ({ donationData }) => {
             
 
             {/* Main container */}
-            <div className="relative w-[210mm] h-[297mm] mx-auto font-sans" id="donation-receipt">
+            <div className="relative w-[210mm] h-[297mm] mx-auto font-canvasans" id="donation-receipt">
                 <img
                     src={tp}
                     alt="Background Template"

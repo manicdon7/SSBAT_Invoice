@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 
+
 .text-shadow {
     text-shadow: 2px 2px 4px rgb(217, 160, 162 , 10); /* Adjust the values for shadow effect */
   }

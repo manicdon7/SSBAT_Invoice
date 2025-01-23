@@ -20,7 +20,12 @@ const DonationReceipt = ({ donationData }) => {
 
     const generatePDF = async () => {
         const receipt = document.getElementById('donation-receipt');
-        const canvas = await html2canvas(receipt, { scale: 2 }); // Higher scale for better quality
+        const canvas = await html2canvas(receipt, { 
+            scale: 2, // Higher scale for better resolution
+            width: 794, // Fixed width for A4
+            height: 1123, // Fixed height for A4
+            useCORS: true, // Avoid cross-origin issues
+        }); // Higher scale for better quality
         const imgData = canvas.toDataURL('image/png');
         
         const pdf = new jsPDF('p', 'mm', 'a4');

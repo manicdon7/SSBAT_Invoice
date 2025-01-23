@@ -91,7 +91,7 @@ const DonationReceipt = ({ donationData }) => {
                                 <p className="font-extrabold text-xl px-4 mb-4">Receipt No: {donationData.Receipt_NO}</p>
                             </div>
                             <div className="bg-[#fce805] px-4 py-2 rounded-full">
-                                <p className="font-extrabold text-xl px-4 mb-4">Receipt Date: {donationData.Donation_Date}</p>
+                                <p className="font-extrabold text-xl px-4 mb-4">Receipt Date: {donationData.Receipt_Date}</p>
                             </div>
                         </div>
 

@@ -206,18 +206,35 @@ const App = () => {
         }
         
         const result = await response.json();
+        console.log(result);
+        
         
         if (result.status === 'success' && Array.isArray(result.data)) {
+          const parseDate = (dateString) => {
+            if (!dateString) return '';
+            // Check ISO format (YYYY-MM-DD)
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+              return new Date(dateString).toISOString().split('T')[0]; // Convert to standardized date
+            }
+            // Check DD-MM-YYYY format
+            if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
+              const [day, month, year] = dateString.split('-');
+              return new Date(`${year}-${month}-${day}`).toISOString().split('T')[0];
+            }
+            return 'Invalid Date';
+          };
+  
           const transformedData = result.data.map(donation => ({
             ...donation,
             Receipt_NO: donation.Receipt_NO?.toString() || '',
             Contributor_Name: donation["Contributor's_Name"] || '',
             Amount: parseFloat(donation.Amount) || 0,
-            Donation_Date: donation.Donation_Date || ''
+            Donation_Date: parseDate(donation.Receipt_Date) || ''
           }));
+  
           setDonations(transformedData);
         } else {
-          throw new Error('Invalid data format received');
+          throw new Error('Invalid data format received from the server.');
         }
       } catch (error) {
         console.error('Error fetching donations:', error);

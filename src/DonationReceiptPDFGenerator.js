@@ -7,53 +7,60 @@ import { MdCall } from "react-icons/md";
 import tp from "../src/assets/SSBATTotalPage.png";
 
 const DonationReceipt = ({ donationData }) => {
-    // const generatePDF = async () => {
-    //     const receipt = document.getElementById('donation-receipt');
-    //     const canvas = await html2canvas(receipt);
-    //     const imgData = canvas.toDataURL('image/png');
-    //     const pdf = new jsPDF('p', 'mm', 'a4');
-    //     const pdfWidth = pdf.internal.pageSize.getWidth();
-    //     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    //     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    //     pdf.save(`donation-receipt-${donationData.Receipt_NO}.pdf`);
-    // };
-
+    // Enhanced PDF generation function with improved resolution and error handling
     const generatePDF = async () => {
-        const receipt = document.getElementById('donation-receipt');
-        const canvas = await html2canvas(receipt, { 
-            scale: 2, // Higher scale for better resolution
-            width: 794, // Fixed width for A4
-            height: 1123, // Fixed height for A4
-            useCORS: true, // Avoid cross-origin issues
-        }); // Higher scale for better quality
-        const imgData = canvas.toDataURL('image/png');
-        
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'FAST'); // Optimize compression
-        const pdfBlob = pdf.output('blob');
-        
-        // Convert to KB and download
-        const fileSizeInKB = pdfBlob.size / 1024;
-        console.log(`PDF Size: ${fileSizeInKB.toFixed(2)} KB`);
-        pdf.save(`donation-receipt-${donationData.Receipt_NO}.pdf`);
-    };
+        try {
+            // Select the donation receipt container for PDF generation
+            const receipt = document.getElementById('donation-receipt');
+            
+            // Capture high-resolution canvas of the receipt
+            const canvas = await html2canvas(receipt, { 
+                scale: 2, // Increased scale for better resolution
+                width: 794, // Fixed width for A4
+                height: 1123, // Fixed height for A4
+                useCORS: true, // Avoid cross-origin issues
+            }); 
 
-   
+            // Convert canvas to image data
+            const imgData = canvas.toDataURL('image/png');
+            
+            // Initialize PDF document with A4 dimensions
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            // Calculate PDF page width and proportional height
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            
+            // Add captured image to PDF with optimized compression
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
+            
+            // Log PDF file size for monitoring
+            const pdfBlob = pdf.output('blob');
+            const fileSizeInKB = pdfBlob.size / 1024;
+            console.log(`PDF Size: ${fileSizeInKB.toFixed(2)} KB`);
+            
+            // Save PDF with unique filename based on receipt number
+            pdf.save(`donation-receipt-${donationData.Receipt_NO}.pdf`);
+        } catch (error) {
+            // Error handling for PDF generation
+            console.error("PDF Generation Error:", error);
+            alert("Failed to generate receipt. Please try again.");
+        }
+    };
 
     return (
         <div className="p-4">
+            {/* Download Receipt Button */}
             <button
                 onClick={generatePDF}
                 className="mb-4 bg-red-700 text-white px-4 py-2 rounded hover:bg-red-800"
             >
                 Download Receipt
             </button>
-            
 
-            {/* Main container */}
+            {/* Main container for donation receipt */}
             <div className="relative w-[210mm] h-[297mm] mx-auto font-canvasans" id="donation-receipt">
+                {/* Background Template Image */}
                 <img
                     src={tp}
                     alt="Background Template"
@@ -62,6 +69,7 @@ const DonationReceipt = ({ donationData }) => {
 
                 {/* Content overlay */}
                 <div className="absolute inset-0">
+                    {/* Trust Header Section */}
                     <div className="px-8 pt-20">
                         <div className="flex justify-between items-start">
                             <div>
@@ -89,8 +97,9 @@ const DonationReceipt = ({ donationData }) => {
                         </h2>
                     </div>
 
-                    {/* Receipt Details */}
+                    {/* Receipt Details Section */}
                     <div className="px-8">
+                        {/* Receipt Number and Date */}
                         <div className="grid grid-cols-2 gap-8 mb-8">
                             <div className="bg-[#fce805] px-4 py-2 rounded-full">
                                 <p className="font-extrabold text-xl px-4 mb-4">Receipt No: {donationData.Receipt_NO}</p>
@@ -102,6 +111,7 @@ const DonationReceipt = ({ donationData }) => {
 
                         {/* Contributor Details */}
                         <div className="space-y-3 mb-6 text-[#750004] ml-20 font-alice">
+                            {/* Individual Detail Rows */}
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>Contributor's Name</p>
                                 <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Contributor_Name}</p>
@@ -112,7 +122,6 @@ const DonationReceipt = ({ donationData }) => {
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>Amount</p>
-                                {/* <p className="col-span-2">: &nbsp;{donationData.Amount}</p> */}
                                 <p className="col-span-2 font-extrabold">: &nbsp;₹ {parseFloat(donationData.Amount).toFixed(2)}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
@@ -157,28 +166,28 @@ const DonationReceipt = ({ donationData }) => {
                         </div>
                     </div>
 
-                    {/* Contact Information - positioned at bottom */}
+                    {/* Contact Information Footer */}
                     <div className=''>
-                    <div className="absolute bottom-2 left-8 right-8  flex justify-between items-center text-sm">
-                        <div className="flex gap-2 items-center">
-                            <div className="mt-4">
-                                <IoIosMail className="text-white text-xl text-center bg-black rounded-full" />
+                        <div className="absolute bottom-2 left-8 right-8 flex justify-between items-center text-sm">
+                            <div className="flex gap-2 items-center">
+                                <div className="mt-4">
+                                    <IoIosMail className="text-white text-xl text-center bg-black rounded-full" />
+                                </div>
+                                <div>
+                                    <span className="mr-2 font-extrabold">Email:</span>
+                                    <span className="font-semibold">ssbatrust@gmail.com</span>
+                                </div>
                             </div>
-                            <div>
-                                <span className="mr-2 font-extrabold">Email:</span>
-                                <span className="font-semibold">ssbatrust@gmail.com</span>
+                            <div className="flex gap-2 items-center">
+                                <div className="mt-4">
+                                    <MdCall className="text-white text-xl text-center bg-black rounded-full" />
+                                </div>
+                                <div>
+                                    <span className="mr-2 font-extrabold">Contact us:</span>
+                                    <span className="font-semibold">99622 24476</span>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex gap-2 items-center">
-                            <div className="mt-4">
-                                <MdCall className="text-white text-xl text-center bg-black rounded-full" />
-                            </div>
-                            <div>
-                                <span className="mr-2 font-extrabold">Contact us:</span>
-                                <span className="font-semibold">99622 24476</span>
-                            </div>
-                        </div>
-                    </div>
                     </div>
                 </div>
             </div>

@@ -200,23 +200,20 @@ const App = () => {
         const response = await fetch(
           'https://script.google.com/macros/s/AKfycbxeiVZ4g-d1QUBplHzUMTj5LXr5bKxwLCvaYNlaCAS5KUXOo2bCzjKWmN79QKyLPl_Z/exec'
         );
-        
+  
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
+  
         const result = await response.json();
-        console.log(result);
-        
-        
+        console.log("Full result:", result);
+  
         if (result.status === 'success' && Array.isArray(result.data)) {
           const parseDate = (dateString) => {
             if (!dateString) return '';
-            // Check ISO format (YYYY-MM-DD)
             if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-              return new Date(dateString).toISOString().split('T')[0]; // Convert to standardized date
+              return new Date(dateString).toISOString().split('T')[0];
             }
-            // Check DD-MM-YYYY format
             if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
               const [day, month, year] = dateString.split('-');
               return new Date(`${year}-${month}-${day}`).toISOString().split('T')[0];
@@ -224,7 +221,10 @@ const App = () => {
             return 'Invalid Date';
           };
   
-          const transformedData = result.data.map(donation => ({
+          // Slice the array from index 3 to infinite
+          const filteredData = result.data.slice(3);
+  
+          const transformedData = filteredData.map(donation => ({
             ...donation,
             Receipt_NO: donation.Receipt_NO?.toString() || '',
             Contributor_Name: donation["Contributor's_Name"] || '',
@@ -243,9 +243,10 @@ const App = () => {
         setLoading(false);
       }
     };
-
+  
     fetchDonations();
   }, []);
+  
 
   const formatDate = (dateString) => {
     try {

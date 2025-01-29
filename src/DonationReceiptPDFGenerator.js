@@ -12,33 +12,33 @@ const DonationReceipt = ({ donationData }) => {
         try {
             // Select the donation receipt container for PDF generation
             const receipt = document.getElementById('donation-receipt');
-            
+
             // Capture high-resolution canvas of the receipt
-            const canvas = await html2canvas(receipt, { 
+            const canvas = await html2canvas(receipt, {
                 scale: 2, // Increased scale for better resolution
                 width: 794, // Fixed width for A4
                 height: 1123, // Fixed height for A4
                 useCORS: true, // Avoid cross-origin issues
-            }); 
+            });
 
             // Convert canvas to image data
             const imgData = canvas.toDataURL('image/png');
-            
+
             // Initialize PDF document with A4 dimensions
             const pdf = new jsPDF('p', 'mm', 'a4');
-            
+
             // Calculate PDF page width and proportional height
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-            
+
             // Add captured image to PDF with optimized compression
             pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
-            
+
             // Log PDF file size for monitoring
             const pdfBlob = pdf.output('blob');
             const fileSizeInKB = pdfBlob.size / 1024;
             console.log(`PDF Size: ${fileSizeInKB.toFixed(2)} KB`);
-            
+
             // Save PDF with unique filename based on receipt number
             pdf.save(`donation-receipt-${donationData.Receipt_NO}.pdf`);
         } catch (error) {
@@ -47,6 +47,18 @@ const DonationReceipt = ({ donationData }) => {
             alert("Failed to generate receipt. Please try again.");
         }
     };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        
+        const date = new Date(dateString);
+        
+        const day = String(date.getDate()).padStart(2, '0'); // Ensures two digits for day
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Gets the month (1-12) and ensures two digits
+        const year = date.getFullYear(); // Gets the full year
+      
+        return `${day}-${month}-${year}`;
+      };
 
     return (
         <div className="p-4">
@@ -138,7 +150,7 @@ const DonationReceipt = ({ donationData }) => {
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>Contribution Date</p>
-                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Contribution_Date}</p>
+                                <p className="col-span-2 font-extrabold">: &nbsp;{formatDate(donationData.Contribution_Date)}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>PAN No</p>

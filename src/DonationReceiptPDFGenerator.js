@@ -50,16 +50,21 @@ const DonationReceipt = ({ donationData }) => {
 
     const formatDate = (dateString) => {
         if (!dateString) return '';
-        
-        const date = new Date(dateString);
-        
-        const day = String(date.getDate()).padStart(2, '0'); // Ensures two digits for day
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Gets the month (1-12) and ensures two digits
-        const year = date.getFullYear(); // Gets the full year
-      
-        return `${day}-${month}-${year}`;
-      };
-
+    
+        // Check if the format is DD-MM-YYYY and convert it
+        const dateParts = dateString.split('-'); // Split by '-'
+        if (dateParts.length === 3) {
+            const [day, month, year] = dateParts;
+            const formattedDate = new Date(`${year}-${month}-${day}`); // Convert to YYYY-MM-DD
+            if (!isNaN(formattedDate.getTime())) {
+                return `${day}-${month}-${year}`; // Return in dd/MM/yyyy format
+            }
+        }
+    
+        console.error("Invalid Date:", dateString);
+        return "Invalid Date";
+    };
+    
     return (
         <div className="p-4">
             {/* Download Receipt Button */}

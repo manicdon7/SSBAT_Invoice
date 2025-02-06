@@ -127,7 +127,7 @@ const DonationReceipt = ({ donationData }) => {
                         </div>
 
                         {/* Contributor Details */}
-                        <div className="space-y-[10px] mb-6 text-[#750004] ml-20 font-alice">
+                        <div className="space-y-[8px] mb-6 text-[#750004] ml-20 font-alice">
                             {/* Individual Detail Rows */}
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>Contributor's Name</p>

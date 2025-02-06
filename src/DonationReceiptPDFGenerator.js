@@ -50,7 +50,7 @@ const DonationReceipt = ({ donationData }) => {
 
     const formatDate = (dateString) => {
         if (!dateString) return '';
-
+    
         // Check if the format is DD-MM-YYYY and convert it
         const dateParts = dateString.split('-'); // Split by '-'
         if (dateParts.length === 3) {
@@ -60,11 +60,11 @@ const DonationReceipt = ({ donationData }) => {
                 return `${day}-${month}-${year}`; // Return in dd/MM/yyyy format
             }
         }
-
+    
         console.error("Invalid Date:", dateString);
         return "Invalid Date";
     };
-
+    
     return (
         <div className="p-4">
             {/* Download Receipt Button */}
@@ -127,7 +127,7 @@ const DonationReceipt = ({ donationData }) => {
                         </div>
 
                         {/* Contributor Details */}
-                        <div className="space-y-[8px] mb-6 text-[#750004] ml-20 font-alice">
+                        <div className="space-y-[10px] mb-6 text-[#750004] ml-20 font-alice">
                             {/* Individual Detail Rows */}
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>Contributor's Name</p>
@@ -146,21 +146,8 @@ const DonationReceipt = ({ donationData }) => {
                                 <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Amount_in_words}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                                {/* Label */}
-                                <p className="font-extrabold whitespace-nowrap">Address</p>
-                                {/* Address with consistent alignment */}
-                                <div className="col-span-2 font-extrabold flex">
-                                    <span className="mr-1">:</span>
-                                    <p
-                                        className="break-words"
-                                        style={{
-                                            wordBreak: "break-word",
-                                            lineHeight: "1.4",
-                                        }}
-                                    >
-                                        {donationData.Address}
-                                    </p>
-                                </div>
+                                <p className='font-extrabold'>Address</p>
+                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Address}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>Payment Mode</p>

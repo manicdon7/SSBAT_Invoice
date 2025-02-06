@@ -50,7 +50,7 @@ const DonationReceipt = ({ donationData }) => {
 
     const formatDate = (dateString) => {
         if (!dateString) return '';
-    
+
         // Check if the format is DD-MM-YYYY and convert it
         const dateParts = dateString.split('-'); // Split by '-'
         if (dateParts.length === 3) {
@@ -60,11 +60,11 @@ const DonationReceipt = ({ donationData }) => {
                 return `${day}-${month}-${year}`; // Return in dd/MM/yyyy format
             }
         }
-    
+
         console.error("Invalid Date:", dateString);
         return "Invalid Date";
     };
-    
+
     return (
         <div className="p-4">
             {/* Download Receipt Button */}
@@ -145,9 +145,14 @@ const DonationReceipt = ({ donationData }) => {
                                 <p className='font-extrabold'>Amount in words</p>
                                 <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Amount_in_words}</p>
                             </div>
-                            <div className="grid grid-cols-3 gap-2">
-                                <p className='font-extrabold'>Address</p>
-                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Address}</p>
+                            <div className="grid grid-cols-3 gap-2 items-start">
+                                <p className="font-extrabold">Address</p>
+                                <p
+                                    className="col-span-2 font-extrabold box-border p-2 rounded-md text-base md:text-sm lg:text-xs whitespace-pre-wrap break-words overflow-hidden text-ellipsis"
+                                    style={{ maxWidth: "100%", wordWrap: "break-word" }}
+                                >
+                                    : &nbsp;{donationData.Address}
+                                </p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>Payment Mode</p>

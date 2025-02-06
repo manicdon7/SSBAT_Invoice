@@ -145,14 +145,22 @@ const DonationReceipt = ({ donationData }) => {
                                 <p className='font-extrabold'>Amount in words</p>
                                 <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Amount_in_words}</p>
                             </div>
-                            <div className="grid grid-cols-3 gap-2 items-start">
-                                <p className="font-extrabold">Address</p>
-                                <p
-                                    className="col-span-2 font-extrabold box-border p-2 rounded-md text-base md:text-sm lg:text-xs whitespace-pre-wrap break-words overflow-hidden text-ellipsis"
-                                    style={{ maxWidth: "100%", wordWrap: "break-word" }}
-                                >
-                                    : &nbsp;{donationData.Address}
-                                </p>
+                            <div className="grid grid-cols-3 gap-2">
+                                {/* Label */}
+                                <p className="font-extrabold whitespace-nowrap">Address</p>
+                                {/* Address with consistent alignment */}
+                                <div className="col-span-2 font-extrabold flex">
+                                    <span className="mr-1">:</span>
+                                    <p
+                                        className="break-words"
+                                        style={{
+                                            wordBreak: "break-word",
+                                            lineHeight: "1.4",
+                                        }}
+                                    >
+                                        {donationData.Address}
+                                    </p>
+                                </div>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>Payment Mode</p>

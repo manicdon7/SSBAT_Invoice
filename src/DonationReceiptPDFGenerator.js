@@ -117,7 +117,7 @@ const DonationReceipt = ({ donationData }) => {
                     {/* Receipt Details Section */}
                     <div className="px-8">
                         {/* Receipt Number and Date */}
-                        <div className="grid grid-cols-2 gap-8 mb-8">
+                        <div className="grid grid-cols-2 gap-8 mb-5">
                             <div className="bg-[#fce805] px-4 py-2 rounded-full">
                                 <p className="font-extrabold text-xl px-4 mb-4">Receipt No: {donationData.Receipt_NO}</p>
                             </div>
@@ -152,10 +152,10 @@ const DonationReceipt = ({ donationData }) => {
                                 <div className="col-span-2 font-extrabold flex">
                                     <span className="mr-1">:</span>
                                     <p
-                                        className="break-words"
+                                        className="break-words w-full"
                                         style={{
                                             wordBreak: "break-word",
-                                            lineHeight: "1.4",
+                                            lineHeight: "1.1",
                                         }}
                                     >
                                         {donationData.Address}

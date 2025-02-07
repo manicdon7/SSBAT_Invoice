@@ -146,8 +146,21 @@ const DonationReceipt = ({ donationData }) => {
                                 <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Amount_in_words}</p>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
-                                <p className='font-extrabold'>Address</p>
-                                <p className="col-span-2 font-extrabold">: &nbsp;{donationData.Address}</p>
+                                {/* Label */}
+                                <p className="font-extrabold whitespace-nowrap">Address</p>
+                                {/* Address with consistent alignment */}
+                                <div className="col-span-2 font-extrabold flex">
+                                    <span className="mr-1">:</span>
+                                    <p
+                                        className="break-words"
+                                        style={{
+                                            wordBreak: "break-word",
+                                            lineHeight: "1.4",
+                                        }}
+                                    >
+                                        {donationData.Address}
+                                    </p>
+                                </div>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                                 <p className='font-extrabold'>Payment Mode</p>

@@ -151,6 +151,9 @@
 
 // export default App;
 
+
+
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaFileDownload, FaEye, FaTimes, FaSpinner, FaRupeeSign, FaCalendarAlt, FaUser, FaSearch } from 'react-icons/fa';
@@ -200,11 +203,12 @@ const App = () => {
         const response = await fetch(
           'https://script.google.com/macros/s/AKfycbxeiVZ4g-d1QUBplHzUMTj5LXr5bKxwLCvaYNlaCAS5KUXOo2bCzjKWmN79QKyLPl_Z/exec'
         );
-  
+
+        
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-  
+        
         const result = await response.json();
         console.log("Full result:", result);
   
@@ -231,7 +235,6 @@ const App = () => {
             Amount: parseFloat(donation.Amount) || 0,
             Donation_Date: parseDate(donation.Receipt_Date) || ''
           }));
-  
           setDonations(transformedData);
         } else {
           throw new Error('Invalid data format received from the server.');
@@ -251,9 +254,9 @@ const App = () => {
   const formatDate = (dateString) => {
     try {
       return new Date(dateString).toLocaleDateString('en-IN', {
-        year: 'numeric',
+        day: 'numeric',
         month: 'long',
-        day: 'numeric'
+        year: 'numeric'
       });
     } catch (error) {
       return dateString;

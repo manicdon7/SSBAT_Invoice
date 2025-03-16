@@ -51,19 +51,27 @@ const DonationReceipt = ({ donationData }) => {
     const formatDate = (dateString) => {
         if (!dateString) return '';
     
-        // Check if the format is DD-MM-YYYY and convert it
         const dateParts = dateString.split('-'); // Split by '-'
+        
         if (dateParts.length === 3) {
-            const [day, month, year] = dateParts;
-            const formattedDate = new Date(`${year}-${month}-${day}`); // Convert to YYYY-MM-DD
+            let [first, second, third] = dateParts;
+    
+            // Check if it's in (YYYY, MM, DD) format
+            if (first.length === 4) {
+                return `${third}-${second}-${first}`; // Convert to DD-MM-YYYY
+            }
+    
+            // Check if it's already in (DD, MM, YYYY) format
+            const formattedDate = new Date(`${third}-${second}-${first}`); // Convert to YYYY-MM-DD
             if (!isNaN(formattedDate.getTime())) {
-                return `${day}-${month}-${year}`; // Return in dd/MM/yyyy format
+                return `${first}-${second}-${third}`; // Return in DD-MM-YYYY format
             }
         }
     
         console.error("Invalid Date:", dateString);
         return "Invalid Date";
     };
+    
     
     return (
         <div className="p-4">
@@ -122,7 +130,7 @@ const DonationReceipt = ({ donationData }) => {
                                 <p className="font-extrabold text-xl px-4 mb-4">Receipt No: {donationData.Receipt_NO}</p>
                             </div>
                             <div className="bg-[#fce805] px-4 py-2 rounded-full">
-                                <p className="font-extrabold text-xl px-4 mb-4">Receipt Date: {donationData.Receipt_Date}</p>
+                                <p className="font-extrabold text-xl px-4 mb-4">Receipt Date: {formatDate(donationData.Receipt_Date)}</p>
                             </div>
                         </div>
 

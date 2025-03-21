@@ -58,7 +58,7 @@ const DonationReceipt = ({ donationData }) => {
     
             // Check if it's in (YYYY, MM, DD) format
             if (first.length === 4) {
-                return `${third}-${second}-${first}`; // Convert to DD-MM-YYYY
+                return `${second}-${third}-${first}`; // Convert to DD-MM-YYYY
             }
     
             // Check if it's already in (DD, MM, YYYY) format
